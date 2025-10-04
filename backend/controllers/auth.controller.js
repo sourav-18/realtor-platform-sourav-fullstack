@@ -172,7 +172,7 @@ exports.ownerLogin = async (req, res) => {
         const token = jwtPackage.getToken({
             tokenData: {
                 id: customerDbRes.dataValues.id,
-                role: constantUtils.role.owner
+                role: constantUtils.role.customer
             }
         })
         res.setHeader('x-access-token', token);
