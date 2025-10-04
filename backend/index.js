@@ -21,6 +21,11 @@ app.use(cors(
 ));
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json());
+app.use((req,res,next)=>{
+    if(!req.body)req.body={};
+    next();
+    return;
+})
 
 //routes
 

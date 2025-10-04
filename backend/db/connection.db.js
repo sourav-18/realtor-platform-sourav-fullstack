@@ -3,7 +3,12 @@ const serverEnv = require("../utils/serverEnv.utils");
 
 const sequelize = new Sequelize(serverEnv.DB_NAME, serverEnv.DB_USER, serverEnv.DB_PASSWORD, {
     host: serverEnv.DB_HOST,
-    dialect: 'postgres'
+    dialect: 'postgres',
+    logging:false
+
 });
 
-sequelize.authenticate().then(()=>console.log("DB connect successfully")).catch((err)=>console.log("DB Connection Error:",err));
+sequelize.authenticate().then(() => console.log("DB connect successfully")).catch((err) => console.log("DB Connection Error:", err));
+sequelize.sync({alter:serverEnv.SERVER_ENV==="dev"?true:false}).then(() => console.log("All DB synced")).catch((err) => console.log("DB Sync Error:", err));
+
+module.exports = sequelize;

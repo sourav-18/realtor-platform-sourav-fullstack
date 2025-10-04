@@ -1,0 +1,18 @@
+module.exports={
+    owners:{
+        status:{
+            active:"active",
+            inactive:"inactive"
+        }
+    },
+    customers:{
+        customerTypes:{
+            guest:"guest",
+            customer:"customer"
+        },
+        status:{
+            active:"active",
+            inactive:"inactive"
+        }
+    }
+}
