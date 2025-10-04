@@ -93,7 +93,7 @@ exports.propertyImages = joi.array().items(this.url.messages({
     "any.required": "images is required",
     "string.empty": "images must not be empty",
     "string.uri": "images must be valid url",
-})).min(1).max(50).messages({
+})).min(1).max(10).messages({
     "array.base": "{#key} should be array",
     "any.required": "{#key} is required",
     "array.min": `{#key} should be at least {#limit} `,
