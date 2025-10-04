@@ -1,14 +1,165 @@
 const responseUtils = require("../utils/response.utils");
+const propertyValidation = require("../validations/property.validation");
+const propertyDb = require("../db/property.db");
+const devLog = require("../utils/devLog.utils");
+const constantUtils = require("../utils/constant.utils");
+const dbConstantUtils = require("../utils/dbConstant.utils");
+const { Op } = require("sequelize");
 
-exports.create = (req, res) => {
-    //     try {
-    //   const validate = authValidation.ownerSignupBody.validate(req.body);
-    // if (validate.error) {
-    // return res.json(responseUtils.errorRes({ message: validate.error.message }));
-    // }
-    return res.json(responseUtils.successRes({ message: "property create successfully" }));
-    //     } catch (error) {
-    //         devLog(error);
-    //         return res.json(responseUtils.errorRes({ message: "Internal Server Error" }));
-    //     }
+exports.create = async (req, res) => {
+    try {
+        const validate = propertyValidation.createBody.validate(req.body);
+        if (validate.error) {
+            return res.json(responseUtils.errorRes({ message: validate.error.message }));
+        }
+        const { title, description, price, topCities, location, images, propertyType, listingType } = req.body;
+        await propertyDb.create({
+            title: title.trim(),
+            description: description.trim(),
+            price: price,
+            top_cities: topCities,
+            location: location.trim(),
+            images: images,
+            property_type: propertyType,
+            listing_type: listingType,
+            owner_id: req.headers.user_id
+        })
+        return res.json(responseUtils.successRes({ message: "property create successfully" }));
+    } catch (error) {
+        devLog(error);
+        return res.json(responseUtils.errorRes({ message: "Internal Server Error" }));
+    }
+}
+
+exports.list = async (req, res) => {
+    try {
+        const validate = propertyValidation.listQuery.validate(req.query);
+        if (validate.error) {
+            return res.json(responseUtils.errorRes({ message: validate.error.message }));
+        }
+        const { skip, limit } = constantUtils.getPaginationValue(req.query.page, req.query.limit);
+        const dbRes = await propertyDb.findAndCountAll({
+            where: {
+                status: dbConstantUtils.property.status.active
+            }, order: [['id', 'DESC']], offset: skip, limit: limit,
+            attributes: { exclude: ["status"] }
+        })
+
+        if (dbRes.rows.length === 0) {
+            return res.json(responseUtils.errorRes({ message: "Property not found" }));
+        }
+        return res.json(responseUtils.successRes({
+            message: "Property fetch successfully", data: {
+                items: dbRes.rows,
+                totalCount: dbRes.count,
+            }
+        }));
+
+    } catch (error) {
+        devLog(error);
+        return res.json(responseUtils.errorRes({ message: "Internal Server Error" }));
+    }
+}
+
+exports.update = async (req, res) => {
+    try {
+        const validate1 = propertyValidation.updatePrams.validate(req.params);
+        const validate2 = propertyValidation.updateBody.validate(req.body);
+        const validate = validate1.error ? validate1 : validate2;
+        if (validate.error) {
+            return res.json(responseUtils.errorRes({ message: validate.error.message }));
+        }
+        const { title, description, price, topCities, location, images, propertyType, listingType } = req.body;
+
+        const updateDbRes = await propertyDb.update({
+            title: title.trim(),
+            description: description.trim(),
+            price: price,
+            top_cities: topCities,
+            location: location.trim(),
+            images: images,
+            property_type: propertyType,
+            listing_type: listingType,
+        },
+            {
+                where: { id: req.params.propertyId, owner_id: req.headers.user_id, status: { [Op.ne]: dbConstantUtils.property.status.delete } },
+                limit: 1
+            },
+        )
+
+        if (!updateDbRes[0]) {
+            return res.json(responseUtils.successRes({ message: "Property not found" }));
+        }
+        return res.json(responseUtils.successRes({ message: "Property updated successfully" }));
+    } catch (error) {
+        devLog(error);
+        return res.json(responseUtils.errorRes({ message: "Internal Server Error" }));
+    }
+}
+
+exports.statusUpdate = async (req, res) => {
+    try {
+        const validate = propertyValidation.statusUpdatePrams.validate(req.params);
+        if (validate.error) {
+            return res.json(responseUtils.errorRes({ message: validate.error.message }));
+        }
+        const updateDbRes = await propertyDb.update({
+            status: req.params.status
+        },
+            {
+                where: { id: req.params.propertyId, owner_id: req.headers.user_id },
+                limit: 1
+            },
+        )
+        if (!updateDbRes[0]) {
+            return res.json(responseUtils.successRes({ message: "Property not found" }));
+        }
+        return res.json(responseUtils.successRes({ message: "property status updated successfully" }));
+    } catch (error) {
+        devLog(error);
+        return res.json(responseUtils.errorRes({ message: "Internal Server Error" }));
+    }
+}
+
+exports.listByOwner = async (req, res) => {
+    try {
+        const validate = propertyValidation.listByOwnerQuery.validate(req.query);
+        if (validate.error) {
+            return res.json(responseUtils.errorRes({ message: validate.error.message }));
+        }
+        const { skip, limit } = constantUtils.getPaginationValue(req.query.page, req.query.limit);
+        const dbRes = await propertyDb.findAndCountAll({
+            where: {
+                status: { [Op.ne]: dbConstantUtils.property.status.delete },
+                owner_id: req.headers.user_id,
+            }, order: [['id', 'DESC']], offset: skip, limit: limit,
+            attributes: { exclude: ["status"] }
+        })
+
+        if (dbRes.rows.length === 0) {
+            return res.json(responseUtils.errorRes({ message: "Property not found" }));
+        }
+
+        return res.json(responseUtils.successRes({
+            message: "Property fetch successfully", data: {
+                items: dbRes.rows,
+                totalCount: dbRes.count,
+            }
+        }));
+
+    } catch (error) {
+        devLog(error);
+        return res.json(responseUtils.errorRes({ message: "Internal Server Error" }));
+    }
+}
+
+exports.staticData = async = (req, res) => {
+    return res.json(responseUtils.successRes({
+        message: "property static fetch successfully",
+        data: {
+            topCities: dbConstantUtils.property.topCities,
+            listingType: dbConstantUtils.property.listingType,
+            propertyType: dbConstantUtils.property.propertyType,
+        }
+    }));
 }

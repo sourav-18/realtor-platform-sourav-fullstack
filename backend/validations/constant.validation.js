@@ -81,5 +81,24 @@ exports.phoneNumber = joi.string().trim().min(10).max(10).messages({
     "string.max": `{#key} must be {#limit} digits`,
 })
 
-exports.ownerPassword=this.longString({ min: 3, max: 50 })
-exports.customerPassword=this.longString({ min: 3, max: 50 })
+exports.price = joi.number().min(1).messages({
+    "number.min": `{#key} should be at least {#limit} `,
+    "number.integer": `{#key} should be integer`,
+    "any.required": `{#key} should be required`,
+    "number.base": `{#key} must be number`
+});
+
+exports.propertyImages = joi.array().items(this.url.messages({
+    "string.base": "images should be text",
+    "any.required": "images is required",
+    "string.empty": "images must not be empty",
+    "string.uri": "images must be valid url",
+})).min(1).max(50).messages({
+    "array.base": "{#key} should be array",
+    "any.required": "{#key} is required",
+    "array.min": `{#key} should be at least {#limit} `,
+    "array.max": `{#key} should be at least {#limit}`,
+})
+
+exports.ownerPassword = this.longString({ min: 3, max: 50 })
+exports.customerPassword = this.longString({ min: 3, max: 50 })

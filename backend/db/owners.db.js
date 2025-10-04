@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("./connection.db");
 const dbConstant=require("../utils/dbConstant.utils");
 
-const owners = sequelize.define("owners",
+const owner = sequelize.define("owners",
     {
         name: {
             type: DataTypes.STRING,
@@ -28,4 +28,4 @@ const owners = sequelize.define("owners",
     }
 )
 
-module.exports = owners;
+module.exports = owner;

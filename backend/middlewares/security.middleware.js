@@ -29,6 +29,7 @@ exports.checkTokenWithRoles = (req, res, next, roles) => {
         if (!roles || roles.length == 0||!roles.includes(tokenData.role)) {
             return res.json(responseUtils.errorRes({ message: "Access to this field is not allowed." }));
         }
+        req.headers.user_id=tokenData.id;
         next();
     } catch (error) {
         devLog(error);

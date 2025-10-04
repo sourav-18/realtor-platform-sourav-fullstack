@@ -147,7 +147,7 @@ exports.customerSignup = async (req, res) => {
     }
 }
 
-exports.ownerLogin = async (req, res) => {
+exports.customerLogin = async (req, res) => {
     try {
         const validate = authValidation.customerLoginBody.validate(req.body);
         if (validate.error) {

@@ -9,6 +9,7 @@ const sequelize = new Sequelize(serverEnv.DB_NAME, serverEnv.DB_USER, serverEnv.
 });
 
 sequelize.authenticate().then(() => console.log("DB connect successfully")).catch((err) => console.log("DB Connection Error:", err));
+
 sequelize.sync({alter:serverEnv.SERVER_ENV==="dev"?true:false}).then(() => console.log("All DB synced")).catch((err) => console.log("DB Sync Error:", err));
 
 module.exports = sequelize;
