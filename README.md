@@ -48,22 +48,20 @@ A fullstack web application where property owners can list their properties, and
 
 ---
 
-## 📂 Project Structure
-
 ## Database setup
 create database (any name)
 
 ## Backend Setup
-cd backend
-cp .env.example .env
-npm install
-npm run dev  
+- cd backend
+- cp .env.example .env
+- npm install
+- npm run dev  
 
 ## Frontend Setup
-cd ../frontend
-cp .env.example .env
-npm install
-npm run dev
+- cd ../frontend
+- cp .env.example .env
+- npm install
+- npm run dev
 
 🌐 Links
 
