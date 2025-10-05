@@ -33,7 +33,7 @@ const Home = () => {
             Discover the perfect home from thousands of listings. Buy, rent, or sell properties with ease.
           </p>
           <Link 
-            to="/properties" 
+            to="/" 
             className="bg-white text-primary-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition inline-block"
           >
             Browse Properties
@@ -70,42 +70,6 @@ const Home = () => {
               <p className="text-gray-600">Secure transactions and verified listings from trusted property owners.</p>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Featured Properties */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold">Featured Properties</h2>
-            <Link 
-              to="/properties" 
-              className="text-primary-600 hover:text-primary-700 font-semibold"
-            >
-              View All Properties →
-            </Link>
-          </div>
-
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white rounded-lg shadow-md p-4 animate-pulse">
-                  <div className="bg-gray-300 h-48 rounded mb-4"></div>
-                  <div className="space-y-2">
-                    <div className="bg-gray-300 h-4 rounded"></div>
-                    <div className="bg-gray-300 h-4 rounded w-2/3"></div>
-                    <div className="bg-gray-300 h-4 rounded w-1/2"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredProperties&&featuredProperties.map(property => (
-                <PropertyCard key={property.id} property={property} />
-              ))}
-            </div>
-          )}
         </div>
       </section>
     </div>

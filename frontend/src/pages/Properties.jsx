@@ -12,17 +12,17 @@ const Properties = () => {
   const [sortBy, setSortBy] = useState('');
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(20); 
+  const [itemsPerPage] = useState(20);
   const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     fetchProperties();
-  }, [currentPage, filters, searchTerm]); 
+  }, [currentPage, filters, searchTerm]);
 
   const fetchProperties = async () => {
     try {
       setLoading(true);
-      
+
       const apiParams = {
         page: currentPage,
         limit: itemsPerPage,
@@ -55,11 +55,13 @@ const Properties = () => {
       }
 
       const data = await propertyService.getAll(apiParams);
-      
+
       if (data.statusCode === 200) {
         setProperties(data.data?.items || []);
         setTotalCount(data.data?.totalCount || 0);
       } else {
+        setProperties([]);
+        setTotalCount(0);
         console.error('API Error:', data.message);
       }
     } catch (error) {
@@ -71,12 +73,12 @@ const Properties = () => {
 
   const handleSearch = (term) => {
     setSearchTerm(term);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
 
   const handleFilter = (newFilters) => {
     setFilters(newFilters);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
 
 
@@ -88,18 +90,18 @@ const Properties = () => {
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
-    
+
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
+
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
-    
+
     for (let i = startPage; i <= endPage; i++) {
       pages.push(i);
     }
-    
+
     return pages;
   };
 
@@ -126,10 +128,10 @@ const Properties = () => {
           <p className="text-xl text-gray-600">Find your perfect home from our curated collection</p>
         </div>
 
-        <SearchFilters 
-          onSearch={handleSearch} 
-          onFilter={handleFilter} 
-          loading={loading} 
+        <SearchFilters
+          onSearch={handleSearch}
+          onFilter={handleFilter}
+          loading={loading}
           currentFilters={filters}
         />
 
@@ -157,12 +159,12 @@ const Properties = () => {
                 {filters.propertyType && ` • ${filters.propertyType}`}
                 {filters.listingType && ` • For ${filters.listingType}`}
               </p>
-              
+
               {/* Sort Options */}
               <div className="flex items-center space-x-2">
                 <label className="text-sm text-gray-600">Sort by:</label>
-                <select 
-                  value={filters.sortBy || 'newest'} 
+                <select
+                  value={filters.sortBy || 'newest'}
                   onChange={handleSortChange}
                   className="border border-gray-300 rounded px-3 py-1 text-sm"
                 >
@@ -178,8 +180,8 @@ const Properties = () => {
                 <div className="text-gray-400 text-6xl mb-4">🏠</div>
                 <h3 className="text-xl font-semibold text-gray-600 mb-2">No properties found</h3>
                 <p className="text-gray-500">
-                  {searchTerm || Object.keys(filters).length > 0 
-                    ? 'Try adjusting your search criteria or filters' 
+                  {searchTerm || Object.keys(filters).length > 0
+                    ? 'Try adjusting your search criteria or filters'
                     : 'No properties available at the moment'
                   }
                 </p>
@@ -212,11 +214,10 @@ const Properties = () => {
                     <button
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className={`flex items-center px-3 py-2 rounded-lg border ${
-                        currentPage === 1
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                          : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
-                      }`}
+                      className={`flex items-center px-3 py-2 rounded-lg border ${currentPage === 1
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
+                        }`}
                     >
                       <ChevronLeft size={16} className="mr-1" />
                       Previous
@@ -227,11 +228,10 @@ const Properties = () => {
                       <button
                         key={page}
                         onClick={() => handlePageChange(page)}
-                        className={`px-3 py-2 rounded-lg border ${
-                          currentPage === page
-                            ? 'bg-primary-600 text-white border-primary-600'
-                            : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
-                        }`}
+                        className={`px-3 py-2 rounded-lg border ${currentPage === page
+                          ? 'bg-primary-600 text-white border-primary-600'
+                          : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
+                          }`}
                       >
                         {page}
                       </button>
@@ -241,11 +241,10 @@ const Properties = () => {
                     <button
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                      className={`flex items-center px-3 py-2 rounded-lg border ${
-                        currentPage === totalPages
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                          : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
-                      }`}
+                      className={`flex items-center px-3 py-2 rounded-lg border ${currentPage === totalPages
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
+                        }`}
                     >
                       Next
                       <ChevronRight size={16} className="ml-1" />

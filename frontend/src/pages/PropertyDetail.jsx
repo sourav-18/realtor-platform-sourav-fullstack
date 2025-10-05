@@ -97,7 +97,7 @@ const PropertyDetail = () => {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h1 className="text-2xl font-bold text-gray-800">Property not found</h1>
-          <Link to="/properties" className="text-primary-600 hover:text-primary-700">
+          <Link to="/" className="text-primary-600 hover:text-primary-700">
             Back to Properties
           </Link>
         </div>
@@ -112,7 +112,7 @@ const PropertyDetail = () => {
       <div className="max-w-6xl mx-auto px-4">
         {/* Breadcrumb */}
         <nav className="mb-6">
-          <Link to="/properties" className="text-primary-600 hover:text-primary-700">
+          <Link to="/" className="text-primary-600 hover:text-primary-700">
             ← Back to Properties
           </Link>
         </nav>

@@ -37,7 +37,7 @@ const Login = () => {
         if (apiRes.statusCode === 500) {
           setError(apiRes.message);
         } else {
-          navigate('/properties');
+          navigate('/');
           localStorage.setItem('token', apiRes.data?.token);
         }
       } else if (formData.role == 'owner') {
@@ -46,7 +46,7 @@ const Login = () => {
           setError(apiRes.message);
         } else {
           localStorage.setItem('token', apiRes.data?.token);
-          navigate('/properties');
+          navigate('/');
         }
       }
     } catch (err) {
@@ -89,6 +89,8 @@ const Login = () => {
                   id="phone"
                   name="phone"
                   type="tel"
+                  maxLength={10}
+                  minLength={10}
                   value={formData.phone}
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500"

@@ -45,7 +45,7 @@ const Register = () => {
           setError(apiRes.message);
         } else {
           localStorage.setItem('token', apiRes.data?.token);
-          navigate('/properties');
+          navigate('/');
         }
       } else if (formData.role == 'owner') {
         const apiRes = await ownerRegister(apiData);
@@ -53,7 +53,7 @@ const Register = () => {
           setError(apiRes.message);
         } else {
           localStorage.setItem('token', apiRes.data?.token);
-          navigate('/properties');
+          navigate('/');
         }
       }
     } catch (err) {
@@ -112,6 +112,8 @@ const Register = () => {
                   id="phone"
                   name="phone"
                   type="tel"
+                  maxLength={10}
+                  minLength={10}
                   value={formData.phone}
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500"

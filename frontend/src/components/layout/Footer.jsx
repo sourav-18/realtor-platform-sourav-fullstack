@@ -37,7 +37,7 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <div className="space-y-2">
-              <a href="/properties" className="block text-gray-300 hover:text-white transition">
+              <a href="/" className="block text-gray-300 hover:text-white transition">
                 Browse Properties
               </a>
               <a href="/about" className="block text-gray-300 hover:text-white transition">
@@ -51,7 +51,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-gray-700 mt-8 pt-6 text-center text-gray-300">
-          <p>&copy; 2024 RealtorPro. All rights reserved.</p>
+          <p>&copy; 2025 RealtorPro. All rights reserved.</p>
         </div>
       </div>
     </footer>

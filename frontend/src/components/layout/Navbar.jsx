@@ -18,14 +18,14 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/home" className="flex items-center space-x-2">
             <Home className="h-8 w-8 text-primary-600" />
             <span className="text-xl font-bold text-gray-800">RealtorPro</span>
           </Link>
 
           {/* Navigation Links */}
           <div className="flex items-center space-x-4">
-            <Link to="/properties" className="text-gray-600 hover:text-primary-600 transition">
+            <Link to="/" className="text-gray-600 hover:text-primary-600 transition">
               Browse Properties
             </Link>
 

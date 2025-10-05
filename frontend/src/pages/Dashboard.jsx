@@ -389,21 +389,15 @@ const Dashboard = () => {
         {!isOwner && (
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Find Your Dream Home</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
               <Link
-                to="/properties"
+                to="/"
                 className="bg-primary-600 text-white p-8 rounded-lg text-center hover:bg-primary-700 transition"
               >
                 <Home className="mx-auto mb-4" size={48} />
                 <h3 className="text-xl font-semibold mb-2">Browse Properties</h3>
                 <p>Explore thousands of properties for sale and rent</p>
               </Link>
-
-              <div className="bg-gray-100 p-8 rounded-lg text-center">
-                <User className="mx-auto mb-4 text-gray-400" size={48} />
-                <h3 className="text-xl font-semibold mb-2">Saved Properties</h3>
-                <p>Coming soon - Save your favorite properties</p>
-              </div>
             </div>
           </div>
         )}

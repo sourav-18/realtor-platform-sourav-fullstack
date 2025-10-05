@@ -23,10 +23,10 @@ function App() {
           <Navbar />
           <main className="flex-1">
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<Properties />} />
+              <Route path="/home" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/properties" element={<Properties />} />
               <Route path="/properties/:id" element={<PropertyDetail />} />
               <Route path="/dashboard" element={
                 <ProtectedRoute>

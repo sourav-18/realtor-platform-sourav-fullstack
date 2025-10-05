@@ -1,6 +1,7 @@
 // src/components/common/SearchFilters.jsx
 import React, { useState } from 'react';
 import { Search, Filter, X } from 'lucide-react';
+import constantUtils from "../../utils/constant.utils";
 
 const SearchFilters = ({ onSearch, onFilter, loading = false }) => {
   const [showFilters, setShowFilters] = useState(false);
@@ -12,6 +13,8 @@ const SearchFilters = ({ onSearch, onFilter, loading = false }) => {
     bedrooms: '',
     listingType: ''
   });
+
+   const propertyTypes = constantUtils.propertyTypes;
 
   const handleFilterChange = (key, value) => {
     const newFilters = { ...filters, [key]: value };
@@ -45,7 +48,7 @@ const SearchFilters = ({ onSearch, onFilter, loading = false }) => {
             onChange={(e) => onSearch(e.target.value)}
           />
         </div>
-        
+
         <button
           onClick={() => setShowFilters(!showFilters)}
           className="flex items-center space-x-2 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
@@ -78,10 +81,9 @@ const SearchFilters = ({ onSearch, onFilter, loading = false }) => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
               >
                 <option value="">All Types</option>
-                <option value="apartment">Apartment</option>
-                <option value="house">House</option>
-                <option value="villa">Villa</option>
-                <option value="condo">Condo</option>
+                {propertyTypes.map((item) => (
+                  <option key={item} value={item}>{item.toUpperCase()}</option>
+                ))}
               </select>
             </div>
 
