@@ -22,6 +22,11 @@ const customer = sequelize.define("customers",
             defaultValue: dbConstant.customers.status.active
         }
     },
+    {
+        indexes: [
+            { fields: ['status'] },
+        ]
+    }
 )
 
 module.exports = customer;

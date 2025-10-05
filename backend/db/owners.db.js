@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("./connection.db");
-const dbConstant=require("../utils/dbConstant.utils");
+const dbConstant = require("../utils/dbConstant.utils");
 
 const owner = sequelize.define("owners",
     {
@@ -17,14 +17,19 @@ const owner = sequelize.define("owners",
             type: DataTypes.STRING,
             allowNull: false,
         },
-        status:{
-            type:DataTypes.ENUM(Object.values(dbConstant.owners.status)),
-            defaultValue:dbConstant.owners.status.active
+        status: {
+            type: DataTypes.ENUM(Object.values(dbConstant.owners.status)),
+            defaultValue: dbConstant.owners.status.active
         },
         profile_pic: {
             type: DataTypes.STRING,
             allowNull: false,
         },
+    },
+    {
+        indexes: [
+            { fields: ['status'] },
+        ]
     }
 )
 

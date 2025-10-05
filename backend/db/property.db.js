@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("./connection.db");
-const dbConstant=require("../utils/dbConstant.utils");
-const ownerDb=require("./owners.db");
+const dbConstant = require("../utils/dbConstant.utils");
+const ownerDb = require("./owners.db");
 
 const property = sequelize.define("property",
     {
@@ -41,18 +41,30 @@ const property = sequelize.define("property",
             type: DataTypes.JSON,
             defaultValue: {},
         },
-        status:{
+        status: {
             type: DataTypes.ENUM(Object.values(dbConstant.property.status)),
             defaultValue: dbConstant.property.status.active,
         },
-        owner_id:{
-            type:DataTypes.INTEGER,
-            references:{
-                model:ownerDb,
-                key:'id'
+        owner_id: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: ownerDb,
+                key: 'id'
             },
-            allowNull:false
+            allowNull: false
         }
+    },
+    {
+        indexes: [
+            { fields: ['title'] },
+            { fields: ['listing_type'] },
+            { fields: ['property_type'] },
+            { fields: ['location'] },
+            { fields: ['top_cities'] },
+            { fields: ['price'] },
+            { fields: ['status'] },
+            { fields: ['owner_id'] },
+        ]
     }
 )
 
