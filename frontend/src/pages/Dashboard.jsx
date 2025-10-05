@@ -152,7 +152,7 @@ const Dashboard = () => {
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(2); // Show 6 properties per page
+  const [itemsPerPage] = useState(10); 
   const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
