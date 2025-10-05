@@ -15,11 +15,11 @@ exports.create = async (req, res) => {
         }
         const { title, description, price, topCities, location, images, propertyType, listingType, specifications } = req.body;
         const createData = {
-            title: title.trim().toLowerCase(),
-            description: description.trim().toLowerCase(),
+            title: title.trim(),
+            description: description.trim(),
             price: price,
             top_cities: topCities,
-            location: location.trim().toLowerCase(),
+            location: location.trim(),
             images: images,
             property_type: propertyType,
             listing_type: listingType,
@@ -44,17 +44,17 @@ exports.list = async (req, res) => {
         const { skip, limit } = constantUtils.getPaginationValue(req.query.page, req.query.limit);
         const { bedrooms, topCities, listingType, propertyType, maxPrice, minPrice, location, search, sortBy } = req.query;
         const filterQuery = { status: dbConstantUtils.property.status.active }
-        
+
         if (topCities) filterQuery.top_cities = topCities;
         if (listingType) filterQuery.listing_type = listingType;
         if (propertyType) filterQuery.property_type = propertyType;
         if (bedrooms) filterQuery['specifications.bedrooms'] = bedrooms;
-        if (location) filterQuery.location = { [Op.like]: `%${location.toLowerCase()}%` };
+        if (location) filterQuery.location = { [Op.iLike]: `%${location}%` };
 
         if (search) {
             filterQuery[Op.or] = [
-                { location: { [Op.like]: `%${search.toLowerCase()}%` } },
-                { title: { [Op.like]: `%${search.toLowerCase()}%` } },
+                { location: { [Op.iLike]: `%${search}%` } },
+                { title: { [Op.iLike]: `%${search}%` } },
             ]
         }
 
@@ -89,6 +89,7 @@ exports.list = async (req, res) => {
         }));
 
     } catch (error) {
+        console.log(error)
         devLog(error);
         return res.json(responseUtils.errorRes({ message: "Internal Server Error" }));
     }
@@ -229,3 +230,11 @@ exports.staticData = async = (req, res) => {
         }
     }));
 }
+
+
+
+[
+
+
+  
+]
