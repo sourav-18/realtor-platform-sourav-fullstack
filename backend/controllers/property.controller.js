@@ -66,7 +66,7 @@ exports.list = async (req, res) => {
             filterQuery[Op.and] = price
         }
 
-        let sortFields = []
+        let sortFields = [['id', 'DESC']]
         if (sortBy) {
             if (sortBy === "price-low") sortFields.unshift(['price', 'ASC']);
             else if (sortBy === "price-high") sortFields.unshift(['price', 'DESC']);
