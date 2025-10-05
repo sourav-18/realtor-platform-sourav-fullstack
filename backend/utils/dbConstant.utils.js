@@ -43,6 +43,11 @@ module.exports = {
             "Ahmedabad",
             "Surat",
             "Jaipur"
-        ]
+        ],
+        specifications:{
+            bedrooms:"bedrooms",
+            bathrooms:"bathrooms",
+            area:"area", //sqft
+        }
     }
 }

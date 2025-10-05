@@ -17,7 +17,8 @@ const EditProperty = () => {
   const fetchProperty = async () => {
     try {
       const data = await propertyService.getById(id);
-      setProperty(data);
+      if (data.statusCode === 200)
+        setProperty(data.data);
     } catch (error) {
       console.error('Error fetching property:', error);
       navigate('/dashboard');
@@ -65,10 +66,10 @@ const EditProperty = () => {
           <p className="text-gray-600">Update your property information</p>
         </div>
 
-        <PropertyForm 
-          onSubmit={handleSubmit} 
-          initialData={property} 
-          loading={loading} 
+        <PropertyForm
+          onSubmit={handleSubmit}
+          initialData={property}
+          loading={loading}
         />
       </div>
     </div>

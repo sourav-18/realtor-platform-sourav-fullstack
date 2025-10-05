@@ -37,6 +37,10 @@ const property = sequelize.define("property",
             type: DataTypes.ENUM(Object.values(dbConstant.property.listingType)),
             allowNull: false,
         },
+        specifications: {
+            type: DataTypes.JSON,
+            defaultValue: {},
+        },
         status:{
             type: DataTypes.ENUM(Object.values(dbConstant.property.status)),
             defaultValue: dbConstant.property.status.active,

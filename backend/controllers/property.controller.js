@@ -13,8 +13,8 @@ exports.create = async (req, res) => {
         if (validate.error) {
             return res.json(responseUtils.errorRes({ message: validate.error.message }));
         }
-        const { title, description, price, topCities, location, images, propertyType, listingType } = req.body;
-        await propertyDb.create({
+        const { title, description, price, topCities, location, images, propertyType, listingType, specifications } = req.body;
+        const createData = {
             title: title.trim(),
             description: description.trim(),
             price: price,
@@ -23,8 +23,10 @@ exports.create = async (req, res) => {
             images: images,
             property_type: propertyType,
             listing_type: listingType,
+            specifications:specifications,
             owner_id: req.headers.user_id
-        })
+        }
+        await propertyDb.create(createData)
         return res.json(responseUtils.successRes({ message: "property create successfully" }));
     } catch (error) {
         devLog(error);
@@ -39,16 +41,21 @@ exports.list = async (req, res) => {
             return res.json(responseUtils.errorRes({ message: validate.error.message }));
         }
         const { skip, limit } = constantUtils.getPaginationValue(req.query.page, req.query.limit);
+        const {specifications,topCities,listingType,propertyType}=req.body;
+        const filterQuery={status: dbConstantUtils.property.status.active}
+        if(topCities)filterQuery.top_cities=topCities;
+        if(topCities)filterQuery.listing_type=listingType;
+        if(topCities)filterQuery.property_type=propertyType;
+
         const dbRes = await propertyDb.findAndCountAll({
-            where: {
-                status: dbConstantUtils.property.status.active
-            }, order: [['id', 'DESC']], offset: skip, limit: limit,
+            where: filterQuery, order: [['id', 'DESC']], offset: skip, limit: limit,
             attributes: { exclude: ["status"] }
         })
 
         if (dbRes.rows.length === 0) {
             return res.json(responseUtils.errorRes({ message: "Property not found" }));
         }
+
         return res.json(responseUtils.successRes({
             message: "Property fetch successfully", data: {
                 items: dbRes.rows,
@@ -70,9 +77,8 @@ exports.update = async (req, res) => {
         if (validate.error) {
             return res.json(responseUtils.errorRes({ message: validate.error.message }));
         }
-        const { title, description, price, topCities, location, images, propertyType, listingType } = req.body;
-
-        const updateDbRes = await propertyDb.update({
+        const { title, description, price, topCities, location, images, propertyType, listingType, specifications } = req.body;
+        const updateData = {
             title: title.trim(),
             description: description.trim(),
             price: price,
@@ -81,7 +87,9 @@ exports.update = async (req, res) => {
             images: images,
             property_type: propertyType,
             listing_type: listingType,
-        },
+        }
+        if(specifications)updateData.specifications=specifications;
+        const updateDbRes = await propertyDb.update(updateData,
             {
                 where: { id: req.params.id, owner_id: req.headers.user_id, status: { [Op.ne]: dbConstantUtils.property.status.delete } },
                 limit: 1
@@ -134,7 +142,7 @@ exports.listByOwner = async (req, res) => {
                 status: { [Op.ne]: dbConstantUtils.property.status.delete },
                 owner_id: req.headers.user_id,
             }, order: [['id', 'DESC']], offset: skip, limit: limit,
-            attributes: { exclude: ["status"] }
+            attributes: { exclude: ["owner_id"] }
         })
 
         if (dbRes.rows.length === 0) {

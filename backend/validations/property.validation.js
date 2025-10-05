@@ -10,7 +10,9 @@ exports.createBody = joi.object({
     location: constantValidation.longString({ min: 5, max: 100 }).required(),
     images: constantValidation.propertyImages.required(),
     propertyType: constantValidation.stringWithValid(dbConstant.property.propertyType).required(),
-    listingType: constantValidation.stringWithValid(Object.values(dbConstant.property.listingType)).required()
+    listingType: constantValidation.stringWithValid(Object.values(dbConstant.property.listingType)).required(),
+    specifications: constantValidation.getSpecifications()
+
 })
 
 exports.updateBody = joi.object({
@@ -21,21 +23,26 @@ exports.updateBody = joi.object({
     location: constantValidation.longString({ min: 5, max: 100 }).required(),
     images: constantValidation.propertyImages.required(),
     propertyType: constantValidation.stringWithValid(dbConstant.property.propertyType).required(),
-    listingType: constantValidation.stringWithValid(Object.values(dbConstant.property.listingType)).required()
+    listingType: constantValidation.stringWithValid(Object.values(dbConstant.property.listingType)).required(),
+    specifications: constantValidation.getSpecifications()
 })
 
-exports.updatePrams=joi.object({
-    id:constantValidation.sqlId.required()
+exports.updatePrams = joi.object({
+    id: constantValidation.sqlId.required()
 })
 
-exports.statusUpdatePrams=joi.object({
-    id:constantValidation.sqlId.required(),
-    status:constantValidation.stringWithValid(Object.values(dbConstant.property.status))
+exports.statusUpdatePrams = joi.object({
+    id: constantValidation.sqlId.required(),
+    status: constantValidation.stringWithValid(Object.values(dbConstant.property.status))
 })
 
 exports.listQuery = joi.object({
     page: constantValidation.page,
-    limit: constantValidation.limit()
+    limit: constantValidation.limit(),
+    propertyType: constantValidation.stringWithValid(dbConstant.property.propertyType),
+    listingType: constantValidation.stringWithValid(Object.values(dbConstant.property.listingType)),
+    topCities: constantValidation.stringWithValid(dbConstant.property.topCities),
+    specifications: constantValidation.getSpecifications()
 })
 
 exports.listByOwnerQuery = joi.object({

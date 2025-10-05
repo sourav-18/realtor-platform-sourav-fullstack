@@ -1,8 +1,8 @@
 import api from './api';
 
 export const propertyService = {
-  getAll: () =>
-    api.get('/properties').then(res => res.data),
+  getAll: (params = {}) =>
+    api.get('/properties', { params }).then(res => res.data),
 
   getById: (id) => {
     const token = localStorage.getItem('token');
@@ -10,7 +10,7 @@ export const propertyService = {
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
-    return api.get(`/properties/${id}`, { headers: {} }).then(res => res.data)
+    return api.get(`/properties/details/${id}`, { headers: {} }).then(res => res.data)
   },
 
   create: (propertyData) =>
@@ -19,9 +19,12 @@ export const propertyService = {
   update: (id, propertyData) =>
     api.put(`/properties/${id}`, propertyData).then(res => res.data),
 
+  statusUpdate: (id, status) =>
+    api.patch(`/properties/${id}/status/${status}`, status).then(res => res.data),
+
   delete: (id) =>
     api.delete(`/properties/${id}`).then(res => res.data),
 
-  getMyProperties: () =>
-    api.get('/properties/my-properties').then(res => res.data),
+  getMyProperties: (params = {}) =>
+    api.get('/properties/list-by-owner',{ params }).then(res => res.data),
 };

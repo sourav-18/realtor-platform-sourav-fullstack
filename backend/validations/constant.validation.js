@@ -1,4 +1,5 @@
-const joi = require("joi")
+const joi = require("joi");
+const dbConstantUtils = require("../utils/dbConstant.utils");
 
 exports.sqlId = joi.number().integer().min(1).messages({
     "number.min": `{#key} should be at least {#limit} `,
@@ -88,6 +89,13 @@ exports.price = joi.number().min(1).messages({
     "number.base": `{#key} must be number`
 });
 
+exports.numberValidate = joi.number().min(0).messages({
+    "number.min": `{#key} should be at least {#limit} `,
+    "number.integer": `{#key} should be integer`,
+    "any.required": `{#key} should be required`,
+    "number.base": `{#key} must be number`
+});
+
 exports.propertyImages = joi.array().items(this.url.messages({
     "string.base": "images should be text",
     "any.required": "images is required",
@@ -102,3 +110,11 @@ exports.propertyImages = joi.array().items(this.url.messages({
 
 exports.ownerPassword = this.longString({ min: 3, max: 50 })
 exports.customerPassword = this.longString({ min: 3, max: 50 })
+
+exports.getSpecifications = () => {
+    const keyValidate = {}
+    for (item of Object.values(dbConstantUtils.property.specifications)) {
+        keyValidate[item] = this.numberValidate
+    }
+    return joi.object(keyValidate)
+}
