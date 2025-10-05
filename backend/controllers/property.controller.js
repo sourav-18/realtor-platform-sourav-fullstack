@@ -49,12 +49,12 @@ exports.list = async (req, res) => {
         if (listingType) filterQuery.listing_type = listingType;
         if (propertyType) filterQuery.property_type = propertyType;
         if (bedrooms) filterQuery['specifications.bedrooms'] = bedrooms;
-        if (location) filterQuery.location = { [Op.like]: `%${location.toLowerCase()}%` };
+        if (location) filterQuery.location = { [Op.iLike]: `%${location}%` };
 
         if (search) {
             filterQuery[Op.or] = [
-                { location: { [Op.ilike]: `%${search}%` } },
-                { title: { [Op.ilike]: `%${search}%` } },
+                { location: { [Op.iLike]: `%${search}%` } },
+                { title: { [Op.iLike]: `%${search}%` } },
             ]
         }
 
@@ -89,6 +89,7 @@ exports.list = async (req, res) => {
         }));
 
     } catch (error) {
+        console.log(error)
         devLog(error);
         return res.json(responseUtils.errorRes({ message: "Internal Server Error" }));
     }
@@ -229,3 +230,11 @@ exports.staticData = async = (req, res) => {
         }
     }));
 }
+
+
+
+[
+
+
+  
+]
