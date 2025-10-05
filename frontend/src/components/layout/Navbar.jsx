@@ -17,6 +17,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
+          
           <Link to="/" className="flex items-center space-x-2">
             <Home className="h-8 w-8 text-primary-600" />
             <span className="text-xl font-bold text-gray-800">RealtorPro</span>

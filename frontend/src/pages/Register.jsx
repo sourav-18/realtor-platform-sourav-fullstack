@@ -5,7 +5,6 @@ import { useAuth } from '../context/AuthContext';
 const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
     password: '',
     confirmPassword: '',
     role: 'customer',
@@ -80,24 +79,6 @@ const Register = () => {
                   type="text"
                   required
                   value={formData.name}
-                  onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
-              </label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={formData.email}
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                 />
