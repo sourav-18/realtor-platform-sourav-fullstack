@@ -10,7 +10,7 @@ const customer = sequelize.define("customers",
         },
         phone_number: {
             type: DataTypes.STRING,
-            allowNull: true,
+            allowNull: false,
             unique: true
         },
         password: {
@@ -20,10 +20,6 @@ const customer = sequelize.define("customers",
         status: {
             type: DataTypes.ENUM(Object.values(dbConstant.customers.status)),
             defaultValue: dbConstant.customers.status.active
-        },
-        customer_type: {
-            type: DataTypes.ENUM(Object.values(dbConstant.customers.customerTypes)),
-            defaultValue: dbConstant.customers.customerTypes.guest
         }
     },
 )

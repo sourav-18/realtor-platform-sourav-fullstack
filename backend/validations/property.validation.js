@@ -25,11 +25,11 @@ exports.updateBody = joi.object({
 })
 
 exports.updatePrams=joi.object({
-    propertyId:constantValidation.sqlId.required()
+    id:constantValidation.sqlId.required()
 })
 
 exports.statusUpdatePrams=joi.object({
-    propertyId:constantValidation.sqlId.required(),
+    id:constantValidation.sqlId.required(),
     status:constantValidation.stringWithValid(Object.values(dbConstant.property.status))
 })
 
@@ -41,4 +41,8 @@ exports.listQuery = joi.object({
 exports.listByOwnerQuery = joi.object({
     page: constantValidation.page,
     limit: constantValidation.limit()
+})
+
+exports.detailsParams = joi.object({
+    id: constantValidation.sqlId.required(),
 })

@@ -12,8 +12,8 @@ const Register = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  const { register } = useAuth();
+
+  const { register, ownerRegister, customerRegister } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -35,9 +35,27 @@ const Register = () => {
     }
 
     try {
-      const { confirmPassword, ...registerData } = formData;
-      await register(registerData);
-      navigate('/dashboard');
+      const apiData = { ...formData };
+      apiData.phoneNumber = apiData.phone;
+      delete apiData.role;
+      delete apiData.phone;
+      if (formData.role == 'customer') {
+        const apiRes = await customerRegister(apiData);
+        if (apiRes.statusCode === 500) {
+          setError(apiRes.message);
+        } else {
+          localStorage.setItem('token', apiRes.data?.token);
+          navigate('/properties');
+        }
+      } else if (formData.role == 'owner') {
+        const apiRes = await ownerRegister(apiData);
+        if (apiRes.statusCode === 500) {
+          setError(apiRes.message);
+        } else {
+          localStorage.setItem('token', apiRes.data?.token);
+          navigate('/properties');
+        }
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
     } finally {

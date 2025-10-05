@@ -26,10 +26,11 @@ exports.checkTokenWithRoles = (req, res, next, roles) => {
             return res.json(responseUtils.errorRes({ message: "Invalid Token" }));
         }
 
-        if (!roles || roles.length == 0||!roles.includes(tokenData.role)) {
+        if (!roles || roles.length == 0 || !roles.includes(tokenData.role)) {
             return res.json(responseUtils.errorRes({ message: "Access to this field is not allowed." }));
         }
-        req.headers.user_id=tokenData.id;
+        req.headers.user_id = tokenData.id;
+        req.headers.user_role = tokenData.role;
         next();
     } catch (error) {
         devLog(error);
@@ -38,22 +39,21 @@ exports.checkTokenWithRoles = (req, res, next, roles) => {
 
 }
 
-exports.checkToken = (req, res, next, roles) => {
+exports.checkToken = (req, res, next) => {
     try {
         let token = req.headers['x-access-token'] || req.headers['authorization'];
-        if (!token) {
-            return res.json(responseUtils.errorRes({ message: "Token not provided" }));
-        }
-        token = token.startsWith("Bearer ") ? token.slice(7) : token;
-        const tokenData = jwtPackage.getTokenData(token);
-
-        if (!tokenData) {
-            return res.json(responseUtils.errorRes({ message: "Invalid Token" }));
+        if (token) {
+            token = token.startsWith("Bearer ") ? token.slice(7) : token;
+            const tokenData = jwtPackage.getTokenData(token);
+            if (tokenData) {
+                req.headers.user_id = tokenData.id;
+                req.headers.user_role = tokenData.role;
+            }
         }
         next();
     } catch (error) {
         devLog(error);
         return res.json(responseUtils.errorRes({ message: "Internal Server Error" }));
     }
-
 }
+

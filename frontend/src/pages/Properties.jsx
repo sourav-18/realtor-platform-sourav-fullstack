@@ -22,7 +22,10 @@ const Properties = () => {
     try {
       setLoading(true);
       const data = await propertyService.getAll();
-      setProperties(data.data || data);
+      if (data.statusCode === 200) {
+        setProperties(data.data?.items||[]);
+      }
+
     } catch (error) {
       console.error('Error fetching properties:', error);
     } finally {

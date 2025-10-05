@@ -4,7 +4,6 @@ const constantValidation = require("./constant.validation");
 exports.ownerSignupBody = joi.object({
     name: constantValidation.longString({ min: 3, max: 50 }).required(),
     phoneNumber: constantValidation.phoneNumber.required(),
-    profilePic:constantValidation.url.required(),
     password: constantValidation.ownerPassword.required(),
     confirmPassword: joi
         .string()

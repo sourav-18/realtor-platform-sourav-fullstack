@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    phone: '',
+    password: '',
+    role: 'customer'
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  const { login } = useAuth();
+
+  const { login, ownerLogin, customerLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -26,8 +27,28 @@ const Login = () => {
     setError('');
 
     try {
-      await login(formData.email, formData.password);
-      navigate('/dashboard');
+      const apiData = { ...formData };
+      apiData.phoneNumber = apiData.phone;
+      apiData.phoneNumber = apiData.phone;
+      delete apiData.role;
+      delete apiData.phone;
+      if (formData.role == 'customer') {
+        const apiRes = await customerLogin(apiData);
+        if (apiRes.statusCode === 500) {
+          setError(apiRes.message);
+        } else {
+          navigate('/properties');
+          localStorage.setItem('token', apiRes.data?.token);
+        }
+      } else if (formData.role == 'owner') {
+        const apiRes = await ownerLogin(apiData);
+        if (apiRes.statusCode === 500) {
+          setError(apiRes.message);
+        } else {
+          localStorage.setItem('token', apiRes.data?.token);
+          navigate('/properties');
+        }
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {
@@ -58,18 +79,17 @@ const Login = () => {
               </div>
             )}
 
+
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                Phone Number
               </label>
               <div className="mt-1">
                 <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={formData.email}
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  value={formData.phone}
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                 />
@@ -91,6 +111,24 @@ const Login = () => {
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                 />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+                Login with
+              </label>
+              <div className="mt-1">
+                <select
+                  id="role"
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                >
+                  <option value="customer">Properties Finder</option>
+                  <option value="owner">Properties List</option>
+                </select>
               </div>
             </div>
 

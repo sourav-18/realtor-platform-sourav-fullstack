@@ -5,6 +5,7 @@ const devLog = require("../utils/devLog.utils");
 const constantUtils = require("../utils/constant.utils");
 const dbConstantUtils = require("../utils/dbConstant.utils");
 const { Op } = require("sequelize");
+const ownersDb = require("../db/owners.db");
 
 exports.create = async (req, res) => {
     try {
@@ -82,7 +83,7 @@ exports.update = async (req, res) => {
             listing_type: listingType,
         },
             {
-                where: { id: req.params.propertyId, owner_id: req.headers.user_id, status: { [Op.ne]: dbConstantUtils.property.status.delete } },
+                where: { id: req.params.id, owner_id: req.headers.user_id, status: { [Op.ne]: dbConstantUtils.property.status.delete } },
                 limit: 1
             },
         )
@@ -107,7 +108,7 @@ exports.statusUpdate = async (req, res) => {
             status: req.params.status
         },
             {
-                where: { id: req.params.propertyId, owner_id: req.headers.user_id },
+                where: { id: req.params.id, owner_id: req.headers.user_id },
                 limit: 1
             },
         )
@@ -147,6 +148,38 @@ exports.listByOwner = async (req, res) => {
             }
         }));
 
+    } catch (error) {
+        devLog(error);
+        return res.json(responseUtils.errorRes({ message: "Internal Server Error" }));
+    }
+}
+
+exports.details = async (req, res) => {
+    try {
+        const validate = propertyValidation.detailsParams.validate(req.params);
+        if (validate.error) {
+            return res.json(responseUtils.errorRes({ message: validate.error.message }));
+        }
+        const dbRes = await propertyDb.findOne({
+            where: {
+                status: dbConstantUtils.property.status.active,
+                id: req.params.id
+            },
+            attributes: { exclude: ["status"] }
+        })
+
+        if (!dbRes) {
+            return res.json(responseUtils.errorRes({ message: "Property not found" }));
+        }
+        const ownerId = dbRes.dataValues.owner_id;
+        delete dbRes.dataValues.owner_id;
+        if (req.headers.user_id) {
+            const ownerDbRes = await ownersDb.findByPk(ownerId, { attributes: ["name", "phone_number"] })
+            if (ownerDbRes)
+                dbRes.dataValues.ownerDetails = { name: ownerDbRes.name, phoneNumber: ownerDbRes.phone_number }
+        }
+
+        return res.json(responseUtils.successRes({ message: "Property details fetch successfully", data: dbRes }));
     } catch (error) {
         devLog(error);
         return res.json(responseUtils.errorRes({ message: "Internal Server Error" }));

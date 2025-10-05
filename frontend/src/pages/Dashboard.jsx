@@ -7,6 +7,7 @@ import PropertyCard from '../components/common/PropertyCard';
 import { Home, Plus, User, Settings } from 'lucide-react';
 
 const Dashboard = () => {
+   console.log("-------------------------1")
   const { user, isOwner } = useAuth();
   const [myProperties, setMyProperties] = useState([]);
   const [loading, setLoading] = useState(true);

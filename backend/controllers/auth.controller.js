@@ -8,18 +8,6 @@ const jwtPackage = require("../packages/jwt.packages");
 const dbConstant = require("../utils/dbConstant.utils");
 const constantUtils = require("../utils/constant.utils");
 
-// exports.demo = async (req, res) => {
-//     try {
-//   const validate = authValidation.ownerSignupBody.validate(req.body);
-// if (validate.error) {
-//     return res.json(responseUtils.errorRes({ message: validate.error.message }));
-// }
-//     } catch (error) {
-//         devLog(error);
-//         return res.json(responseUtils.errorRes({ message: "Internal Server Error" }));
-//     }
-// }
-
 exports.ownerSignup = async (req, res) => {
     try {
         const validate = authValidation.ownerSignupBody.validate(req.body);
@@ -27,7 +15,7 @@ exports.ownerSignup = async (req, res) => {
             return res.json(responseUtils.errorRes({ message: validate.error.message }));
         }
 
-        const { name, phoneNumber, profilePic, password } = req.body;
+        const { name, phoneNumber, password } = req.body;
         const isPhoneNumberExist = await ownersDb.findOne({
             where: { phone_number: phoneNumber },
             attributes: ["id"]
@@ -46,7 +34,7 @@ exports.ownerSignup = async (req, res) => {
             name: name,
             phone_number: phoneNumber,
             password: hashPassword,
-            profile_pic: profilePic
+            profile_pic: "todo"
         })
 
         const token = jwtPackage.getToken({
@@ -57,7 +45,15 @@ exports.ownerSignup = async (req, res) => {
         })
         res.setHeader('x-access-token', token);
 
-        return res.json(responseUtils.successRes({ message: "Signup successfully" }));
+        return res.json(responseUtils.successRes({
+            message: "Signup successfully",
+            data: {
+                name: name,
+                phoneNumber: phoneNumber,
+                role: constantUtils.role.owner,
+                token: token
+            }
+        }));
 
     } catch (error) {
         devLog(error);
@@ -75,7 +71,7 @@ exports.ownerLogin = async (req, res) => {
         const { phoneNumber, password } = req.body;
         const ownerDbRes = await ownersDb.findOne({
             where: { phone_number: phoneNumber, status: dbConstant.owners.status.active },
-            attributes: ["id", "password"]
+            attributes: ["id", "password", "name"]
         });
 
         if (!ownerDbRes) {
@@ -95,7 +91,15 @@ exports.ownerLogin = async (req, res) => {
         })
         res.setHeader('x-access-token', token);
 
-        return res.json(responseUtils.successRes({ message: "login successfully" }));
+        return res.json(responseUtils.successRes({
+            message: "login successfully",
+            data: {
+                name: ownerDbRes.name,
+                phoneNumber: phoneNumber,
+                role: constantUtils.role.owner,
+                token: token
+            }
+        }));
 
     } catch (error) {
         devLog(error);
@@ -139,7 +143,15 @@ exports.customerSignup = async (req, res) => {
         })
         res.setHeader('x-access-token', token);
 
-        return res.json(responseUtils.successRes({ message: "Signup successfully" }));
+        return res.json(responseUtils.successRes({
+            message: "Signup successfully",
+            data: {
+                name: createDbRes.dataValues.name,
+                phoneNumber: phoneNumber,
+                role: constantUtils.role.customer,
+                token: token
+            }
+        }));
 
     } catch (error) {
         devLog(error);
@@ -157,7 +169,7 @@ exports.customerLogin = async (req, res) => {
         const { phoneNumber, password } = req.body;
         const customerDbRes = await customerDb.findOne({
             where: { phone_number: phoneNumber, status: dbConstant.owners.status.active },
-            attributes: ["id", "password"]
+            attributes: ["id", "password", "name"]
         });
 
         if (!customerDbRes) {
@@ -177,7 +189,51 @@ exports.customerLogin = async (req, res) => {
         })
         res.setHeader('x-access-token', token);
 
-        return res.json(responseUtils.successRes({ message: "login successfully" }));
+        return res.json(responseUtils.successRes({
+            message: "login successfully",
+            data: {
+                name: customerDbRes.name,
+                phoneNumber: phoneNumber,
+                role: constantUtils.role.customer,
+                token: token
+            }
+        }));
+
+    } catch (error) {
+        devLog(error);
+        return res.json(responseUtils.errorRes({ message: "Internal Server Error" }));
+    }
+}
+
+exports.profile = async (req, res) => {
+    try {
+        const role = req.headers.user_role;
+        let profileDbRes = null;
+
+        if (role === constantUtils.role.customer) {
+            profileDbRes = await customerDb.findByPk(
+                req.headers.user_id,
+                { attributes: ["id", "name", "phone_number"] }
+            );
+        } else if (role === constantUtils.role.owner) {
+            profileDbRes = await ownersDb.findByPk(
+                req.headers.user_id,
+                { attributes: ["id", "name", "phone_number"] }
+            );
+        }
+
+        if (!profileDbRes) {
+            return res.json(responseUtils.errorRes({ message: "Profile data not found" }));
+        }
+
+        return res.json(responseUtils.successRes({
+            message: "Profile data fetch successfully",
+            data: {
+                name: profileDbRes.name,
+                phoneNumber: profileDbRes.phone_number,
+                role: role,
+            }
+        }));
 
     } catch (error) {
         devLog(error);

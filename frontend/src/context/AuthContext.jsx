@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     if (token) {
       authService.getProfile()
-        .then(userData => setUser(userData))
+        .then(response => setUser(response.statusCode === 200 ? response.data : null))
         .catch(() => {
           localStorage.removeItem('token');
         })
@@ -29,17 +29,28 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const login = async (email, password) => {
-    const response = await authService.login(email, password);
-    setUser(response.user);
-    localStorage.setItem('token', response.token);
+  const ownerLogin = async (email, password) => {
+    const response = await authService.ownerLogin(email, password);
+    setUser(response.statusCode === 200 ? response.data : null);
     return response;
   };
 
-  const register = async (userData) => {
-    const response = await authService.register(userData);
-    setUser(response.user);
-    localStorage.setItem('token', response.token);
+  const customerLogin = async (email, password) => {
+    const response = await authService.customerLogin(email, password);
+    setUser(response.statusCode === 200 ? response.data : null);
+    return response;
+  };
+
+  const ownerRegister = async (userData) => {
+    const response = await authService.ownerRegister(userData);
+    setUser(response.statusCode === 200 ? response.data : null);
+    return response;
+  };
+
+
+  const customerRegister = async (userData) => {
+    const response = await authService.customerRegister(userData);
+    setUser(response.statusCode === 200 ? response.data : null);
     return response;
   };
 
@@ -50,9 +61,11 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
-    login,
-    register,
+    ownerRegister,
+    ownerLogin,
     logout,
+    customerRegister,
+    customerLogin,
     loading,
     isAuthenticated: !!user,
     isOwner: user?.role === 'owner',
