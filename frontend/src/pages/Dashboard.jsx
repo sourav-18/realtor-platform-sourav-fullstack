@@ -265,28 +265,6 @@ const Dashboard = () => {
                 <Settings className="text-green-600" size={32} />
               </div>
             </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600">Total Views</p>
-                  <p className="text-3xl font-bold text-gray-800">
-                    {myProperties.reduce((sum, prop) => sum + (prop.views || 0), 0)}
-                  </p>
-                </div>
-                <Eye className="text-blue-600" size={32} />
-              </div>
-            </div>
-
-            <Link
-              to="/add-property"
-              className="bg-primary-600 text-white p-6 rounded-lg shadow-md hover:bg-primary-700 transition flex items-center justify-center"
-            >
-              <div className="text-center">
-                <Plus className="mx-auto mb-2" size={32} />
-                <p className="font-semibold">Add New Property</p>
-              </div>
-            </Link>
           </div>
         )}
 

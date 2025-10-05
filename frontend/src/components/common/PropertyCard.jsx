@@ -145,15 +145,15 @@ const PropertyCard = ({ property }) => {
             <div className="flex items-center space-x-4">
               <div className="flex items-center">
                 <Bed size={16} className="mr-1" />
-                <span>{property.bedrooms} bed</span>
+                <span>{property.specifications?.bedrooms} bed</span>
               </div>
               <div className="flex items-center">
                 <Bath size={16} className="mr-1" />
-                <span>{property.bathrooms} bath</span>
+                <span>{property.specifications?.bathrooms} bath</span>
               </div>
               <div className="flex items-center">
                 <Square size={16} className="mr-1" />
-                <span>{property.area} sqft</span>
+                <span>{property.specifications?.area} sqft</span>
               </div>
             </div>
           </div>

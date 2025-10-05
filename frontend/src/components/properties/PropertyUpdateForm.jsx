@@ -1,7 +1,11 @@
 import React, { useState, useRef } from 'react';
+import { uploadService } from '../../services/uploadServices';
+import { propertyService } from '../../services/propertyService';
 import { Upload, X, Image as ImageIcon, Plus, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import constantUtils from "../../utils/constant.utils";
 
-const PropertyForm = ({ onSubmit, initialData = {}, loading = false }) => {
+const PropertyUpdateForm = ({ initialData = {}, loading = false }) => {
   const [formData, setFormData] = useState({
     title: initialData.title || '',
     description: initialData.description || '',
@@ -16,34 +20,19 @@ const PropertyForm = ({ onSubmit, initialData = {}, loading = false }) => {
     images: initialData.images || []
   });
 
-  const [imageUrls, setImageUrls] = useState(['']);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
+  const navigate = useNavigate();
+  const [error, setError] = useState('');
 
-  const propertyTypes = ["apartment", "pg", "plots", "flats", "house"];
-  const listingTypes = ["rent", "sale"];
-  const topCities = ["Mumbai", "Delhi", "Bengaluru", "Hyderabad", "Chennai", "Kolkata", "Pune", "Ahmedabad", "Surat", "Jaipur"];
+  const propertyTypes = constantUtils.propertyTypes;
+  const listingTypes = constantUtils.listingTypes;
+  const topCities = constantUtils.topCities;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  // Handle URL-based images
-  const handleImageUrlChange = (index, value) => {
-    const newImageUrls = [...imageUrls];
-    newImageUrls[index] = value;
-    setImageUrls(newImageUrls);
-  };
-
-  const addImageUrl = () => {
-    setImageUrls([...imageUrls, '']);
-  };
-
-  const removeImageUrl = (index) => {
-    const newImageUrls = imageUrls.filter((_, i) => i !== index);
-    setImageUrls(newImageUrls);
   };
 
   // Handle file uploads
@@ -71,72 +60,94 @@ const PropertyForm = ({ onSubmit, initialData = {}, loading = false }) => {
     fileInputRef.current?.click();
   };
 
-  // Upload files to server and get URLs
-  const uploadFiles = async (files) => {
-    const uploadedUrls = [];
-    
-    for (const fileData of files) {
-      try {
-        // Simulate file upload - replace with your actual upload API
-        const formData = new FormData();
-        formData.append('image', fileData.file);
-        
-        // Replace this with your actual upload endpoint
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
-        
-        if (response.ok) {
-          const result = await response.json();
-          uploadedUrls.push(result.url); // Assuming API returns { url: '...' }
-        } else {
-          console.error('Upload failed for file:', fileData.file.name);
-        }
-      } catch (error) {
-        console.error('Error uploading file:', error);
-      }
-    }
-    
-    return uploadedUrls;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setUploading(true);
 
     try {
-      // Upload files first if any
       let newImageUrls = [];
+
+      // Bulk upload images if any files are selected
       if (uploadedFiles.length > 0) {
-        newImageUrls = await uploadFiles(uploadedFiles);
+        console.log(`Starting bulk upload of ${uploadedFiles.length} images...`);
+
+        const formData = new FormData();
+
+        // Append all files to FormData
+        uploadedFiles.forEach((fileData) => {
+          formData.append('images', fileData.file);
+        });
+
+        try {
+          const apiRes = await uploadService.bulkImage(formData);
+
+          if (apiRes.statusCode === 200) {
+            newImageUrls = apiRes.data && apiRes.data.length ? apiRes.data : [];
+          } else if (apiRes.statusCode === 500) {
+            setError(apiRes.message);
+            return;
+          }
+        } catch (uploadError) {
+          setError(uploadError.message);
+          return;
+        }
       }
 
-      // Combine existing URLs, new URLs, and uploaded file URLs
-      const validExistingUrls = imageUrls.filter(url => url.trim() !== '');
-      const allImages = [...formData.images, ...validExistingUrls, ...newImageUrls];
 
-      // Remove duplicates
+      const allImages = [
+        ...formData.images,
+        ...newImageUrls
+      ].filter(url => url && url.trim() !== '');
+
       const uniqueImages = [...new Set(allImages)];
 
-      onSubmit({ 
-        ...formData, 
+      // Prepare submission data
+      const submitData = {
+        ...formData,
         images: uniqueImages,
         specifications: {
-          bedrooms: formData.bedrooms,
-          bathrooms: formData.bathrooms,
-          area: formData.area
-        },
-        property_type: formData.propertyType,
-        listing_type: formData.listingType,
-        top_cities: formData.topCities
+          bedrooms: parseInt(formData.bedrooms) || 0,
+          bathrooms: parseFloat(formData.bathrooms) || 0,
+          area: parseInt(formData.area) || 0
+        }
+      };
+      delete submitData.area;
+      delete submitData.bathrooms;
+      delete submitData.bedrooms;
+
+
+
+      // Submit the form data
+      const apiRes = await propertyService.update(initialData.id, submitData);
+      if (apiRes.statusCode === 500) {
+        setError(apiRes.message);
+        return;
+      }
+
+      // Cleanup: Revoke object URLs to free memory
+      uploadedFiles.forEach(file => {
+        if (file.preview) {
+          URL.revokeObjectURL(file.preview);
+        }
       });
 
-      // Clean up uploaded files previews
-      uploadedFiles.forEach(file => URL.revokeObjectURL(file.preview));
+      // Reset uploaded files state on success
+      setUploadedFiles([]);
+      alert(`Properties Update successfully`);
+      navigate('/dashboard');
 
     } catch (error) {
-      console.error('Error uploading images:', error);
+      console.error('Form submission error:', error);
+
+      // Show user-friendly error message
+      const errorMessage = error.message || 'Failed to submit property. Please try again.';
+
+      // You can replace this with a toast notification or custom modal
+      alert(`Error: ${errorMessage}`);
+
+      // Optionally, you can set an error state to show in the UI
+      // setSubmissionError(errorMessage);
+
     } finally {
       setUploading(false);
     }
@@ -148,6 +159,10 @@ const PropertyForm = ({ onSubmit, initialData = {}, loading = false }) => {
         {/* Basic Information */}
         <div className="md:col-span-2">
           <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
+              {error}
+            </div>)}
         </div>
 
         <div className="md:col-span-2">
@@ -371,41 +386,6 @@ const PropertyForm = ({ onSubmit, initialData = {}, loading = false }) => {
               </div>
             )}
           </div>
-
-          {/* Image URLs Section */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">Add Image URLs</label>
-            <div className="space-y-2">
-              {imageUrls.map((url, index) => (
-                <div key={index} className="flex space-x-2">
-                  <input
-                    type="url"
-                    value={url}
-                    onChange={(e) => handleImageUrlChange(index, e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="https://example.com/image.jpg"
-                  />
-                  {imageUrls.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeImageUrl(index)}
-                      className="px-3 py-2 text-red-600 hover:text-red-800 transition"
-                    >
-                      <X size={20} />
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={addImageUrl}
-                className="flex items-center space-x-2 px-4 py-2 text-primary-600 hover:text-primary-800 transition"
-              >
-                <Plus size={16} />
-                <span>Add Another Image URL</span>
-              </button>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -426,9 +406,9 @@ const PropertyForm = ({ onSubmit, initialData = {}, loading = false }) => {
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
           )}
           <span>
-            {uploading ? 'Uploading Images...' : 
-             loading ? 'Saving...' : 
-             (initialData.id ? 'Update Property' : 'Create Property')}
+            {uploading ? 'Uploading Images...' :
+              loading ? 'Saving...' :
+                (initialData.id ? 'Update Property' : 'Create Property')}
           </span>
         </button>
       </div>
@@ -436,4 +416,4 @@ const PropertyForm = ({ onSubmit, initialData = {}, loading = false }) => {
   );
 };
 
-export default PropertyForm;
+export default PropertyUpdateForm;

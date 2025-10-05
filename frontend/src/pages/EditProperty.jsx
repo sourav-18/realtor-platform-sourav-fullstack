@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { propertyService } from '../services/propertyService';
-import PropertyForm from '../components/properties/PropertyForm';
+import PropertyForm from '../components/properties/PropertyUpdateForm';
 
 const EditProperty = () => {
   const { id } = useParams();

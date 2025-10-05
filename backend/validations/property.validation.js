@@ -39,16 +39,21 @@ exports.statusUpdatePrams = joi.object({
 exports.listQuery = joi.object({
     page: constantValidation.page,
     limit: constantValidation.limit(),
+    search: constantValidation.longString({min:2,max:100}),
+    location: constantValidation.longString({min:2,max:100}),
+    minPrice: constantValidation.price,
+    maxPrice: constantValidation.price,
     propertyType: constantValidation.stringWithValid(dbConstant.property.propertyType),
     listingType: constantValidation.stringWithValid(Object.values(dbConstant.property.listingType)),
     topCities: constantValidation.stringWithValid(dbConstant.property.topCities),
-    specifications: constantValidation.getSpecifications()
-})
+    bedrooms: constantValidation.numberValidate,
+    sortBy:constantValidation.stringWithValid(["price-high","price-low","newest"])
+}).unknown(true)
 
 exports.listByOwnerQuery = joi.object({
     page: constantValidation.page,
     limit: constantValidation.limit()
-})
+}).unknown(true)
 
 exports.detailsParams = joi.object({
     id: constantValidation.sqlId.required(),

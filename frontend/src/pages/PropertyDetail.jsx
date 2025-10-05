@@ -214,12 +214,12 @@ const PropertyDetail = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
                   <div className="text-center">
                     <Bed className="mx-auto mb-2 text-gray-600" size={24} />
-                    <div className="font-semibold">{property.bedrooms}</div>
+                    <div className="font-semibold">{property.specifications?.bedrooms}</div>
                     <div className="text-sm text-gray-600">Bedrooms</div>
                   </div>
                   <div className="text-center">
                     <Bath className="mx-auto mb-2 text-gray-600" size={24} />
-                    <div className="font-semibold">{property.bathrooms}</div>
+                    <div className="font-semibold">{property.specifications?.bathrooms}</div>
                     <div className="text-sm text-gray-600">Bathrooms</div>
                   </div>
                   <div className="text-center">
@@ -229,7 +229,7 @@ const PropertyDetail = () => {
                   </div>
                   <div className="text-center">
                     <div className="mx-auto mb-2 text-gray-600 text-sm font-semibold uppercase">
-                      {property.propertyType}
+                      {property.property_type}
                     </div>
                     <div className="font-semibold capitalize">{property.propertyType}</div>
                     <div className="text-sm text-gray-600">Type</div>
@@ -247,16 +247,16 @@ const PropertyDetail = () => {
                   <h2 className="text-xl font-semibold mb-3">Property Details</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <strong>Property Type:</strong> {property.propertyType}
+                      <strong>Property Type:</strong> {property.property_type}
                     </div>
                     <div>
                       <strong>Listing Type:</strong> For {property.listingType}
                     </div>
                     <div>
-                      <strong>Bedrooms:</strong> {property.bedrooms}
+                      <strong>Bedrooms:</strong> {property.specifications?.bedrooms}
                     </div>
                     <div>
-                      <strong>Bathrooms:</strong> {property.bathrooms}
+                      <strong>Bathrooms:</strong> {property.specifications?.bathrooms}
                     </div>
                     <div>
                       <strong>Area:</strong> {property.area} sqft

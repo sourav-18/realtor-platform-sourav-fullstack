@@ -44,10 +44,10 @@ module.exports = {
             "Surat",
             "Jaipur"
         ],
-        specifications:{
-            bedrooms:"bedrooms",
-            bathrooms:"bathrooms",
-            area:"area", //sqft
+        specifications: {
+            bedrooms: "bedrooms",
+            bathrooms: "bathrooms",
+            area: "area", //sqft
         }
     }
 }

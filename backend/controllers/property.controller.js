@@ -15,15 +15,15 @@ exports.create = async (req, res) => {
         }
         const { title, description, price, topCities, location, images, propertyType, listingType, specifications } = req.body;
         const createData = {
-            title: title.trim(),
-            description: description.trim(),
+            title: title.trim().toLowerCase(),
+            description: description.trim().toLowerCase(),
             price: price,
             top_cities: topCities,
-            location: location.trim(),
+            location: location.trim().toLowerCase(),
             images: images,
             property_type: propertyType,
             listing_type: listingType,
-            specifications:specifications,
+            specifications: specifications,
             owner_id: req.headers.user_id
         }
         await propertyDb.create(createData)
@@ -40,15 +40,40 @@ exports.list = async (req, res) => {
         if (validate.error) {
             return res.json(responseUtils.errorRes({ message: validate.error.message }));
         }
+
         const { skip, limit } = constantUtils.getPaginationValue(req.query.page, req.query.limit);
-        const {specifications,topCities,listingType,propertyType}=req.body;
-        const filterQuery={status: dbConstantUtils.property.status.active}
-        if(topCities)filterQuery.top_cities=topCities;
-        if(topCities)filterQuery.listing_type=listingType;
-        if(topCities)filterQuery.property_type=propertyType;
+        const { bedrooms, topCities, listingType, propertyType, maxPrice, minPrice, location, search, sortBy } = req.query;
+        const filterQuery = { status: dbConstantUtils.property.status.active }
+        
+        if (topCities) filterQuery.top_cities = topCities;
+        if (listingType) filterQuery.listing_type = listingType;
+        if (propertyType) filterQuery.property_type = propertyType;
+        if (bedrooms) filterQuery['specifications.bedrooms'] = bedrooms;
+        if (location) filterQuery.location = { [Op.like]: `%${location.toLowerCase()}%` };
+
+        if (search) {
+            filterQuery[Op.or] = [
+                { location: { [Op.like]: `%${search.toLowerCase()}%` } },
+                { title: { [Op.like]: `%${search.toLowerCase()}%` } },
+            ]
+        }
+
+        if (minPrice || maxPrice) {
+            if ((minPrice && maxPrice) && minPrice > maxPrice) return res.json(responseUtils.errorRes({ message: "Invalid min max value" }));
+            const price = [];
+            if (minPrice) price.push({ price: { [Op.gte]: minPrice } });
+            if (maxPrice) price.push({ price: { [Op.lte]: maxPrice } });
+            filterQuery[Op.and] = price
+        }
+
+        let sortFields = []
+        if (sortBy) {
+            if (sortBy === "price-low") sortFields.unshift(['price', 'ASC']);
+            else if (sortBy === "price-high") sortFields.unshift(['price', 'DESC']);
+        }
 
         const dbRes = await propertyDb.findAndCountAll({
-            where: filterQuery, order: [['id', 'DESC']], offset: skip, limit: limit,
+            where: filterQuery, order: sortFields, offset: skip, limit: limit,
             attributes: { exclude: ["status"] }
         })
 
@@ -88,7 +113,7 @@ exports.update = async (req, res) => {
             property_type: propertyType,
             listing_type: listingType,
         }
-        if(specifications)updateData.specifications=specifications;
+        if (specifications) updateData.specifications = specifications;
         const updateDbRes = await propertyDb.update(updateData,
             {
                 where: { id: req.params.id, owner_id: req.headers.user_id, status: { [Op.ne]: dbConstantUtils.property.status.delete } },

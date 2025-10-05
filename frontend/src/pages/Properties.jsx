@@ -6,36 +6,61 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const Properties = () => {
   const [properties, setProperties] = useState([]);
-  const [filteredProperties, setFilteredProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({});
-  
-  // Pagination state
+  const [sortBy, setSortBy] = useState('');
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(20); 
   const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     fetchProperties();
-  }, [currentPage]); // Refetch when page changes
-
-  useEffect(() => {
-    filterProperties();
-  }, [properties, searchTerm, filters]);
+  }, [currentPage, filters, searchTerm]); 
 
   const fetchProperties = async () => {
     try {
       setLoading(true);
-      const data = await propertyService.getAll({
+      
+      const apiParams = {
         page: currentPage,
         limit: itemsPerPage,
-        ...filters // Pass filters to backend for server-side filtering
-      });
+      };
+
+      if (searchTerm) {
+        apiParams.search = searchTerm;
+      }
+
+      if (filters.location) {
+        apiParams.location = filters.location;
+      }
+      if (filters.propertyType) {
+        apiParams.propertyType = filters.propertyType;
+      }
+      if (filters.listingType) {
+        apiParams.listingType = filters.listingType;
+      }
+      if (filters.bedrooms) {
+        apiParams.bedrooms = filters.bedrooms;
+      }
+      if (filters.minPrice) {
+        apiParams.minPrice = filters.minPrice;
+      }
+      if (filters.maxPrice) {
+        apiParams.maxPrice = filters.maxPrice;
+      }
+      if (filters.sortBy) {
+        apiParams.sortBy = filters.sortBy;
+      }
+
+      const data = await propertyService.getAll(apiParams);
       
       if (data.statusCode === 200) {
         setProperties(data.data?.items || []);
         setTotalCount(data.data?.totalCount || 0);
+      } else {
+        console.error('API Error:', data.message);
       }
     } catch (error) {
       console.error('Error fetching properties:', error);
@@ -44,66 +69,22 @@ const Properties = () => {
     }
   };
 
-  const filterProperties = () => {
-    let filtered = properties;
-
-    // Client-side search filter (only if not using server-side)
-    if (searchTerm) {
-      filtered = filtered.filter(property =>
-        property.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        property.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        property.location?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Client-side filters (only if not using server-side)
-    if (filters.location && !filters.location.includes('server')) {
-      filtered = filtered.filter(property =>
-        property.location?.toLowerCase().includes(filters.location.toLowerCase())
-      );
-    }
-
-    if (filters.propertyType && !filters.propertyType.includes('server')) {
-      filtered = filtered.filter(property => property.propertyType === filters.propertyType);
-    }
-
-    if (filters.listingType && !filters.listingType.includes('server')) {
-      filtered = filtered.filter(property => property.listingType === filters.listingType);
-    }
-
-    if (filters.bedrooms && !filters.bedrooms.includes('server')) {
-      filtered = filtered.filter(property => property.bedrooms >= parseInt(filters.bedrooms));
-    }
-
-    if (filters.minPrice && !filters.minPrice.includes('server')) {
-      filtered = filtered.filter(property => property.price >= parseInt(filters.minPrice));
-    }
-
-    if (filters.maxPrice && !filters.maxPrice.includes('server')) {
-      filtered = filtered.filter(property => property.price <= parseInt(filters.maxPrice));
-    }
-
-    setFilteredProperties(filtered);
-  };
-
   const handleSearch = (term) => {
     setSearchTerm(term);
-    setCurrentPage(1); // Reset to first page when searching
+    setCurrentPage(1); 
   };
 
   const handleFilter = (newFilters) => {
     setFilters(newFilters);
-    setCurrentPage(1); // Reset to first page when filtering
-    // Optionally, you can trigger a new API call here for server-side filtering
-    // fetchProperties(); // Uncomment if using server-side filtering
+    setCurrentPage(1); 
   };
 
-  // Calculate pagination values
+
   const totalPages = Math.ceil(totalCount / itemsPerPage);
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalCount);
 
-  // Generate page numbers for pagination
+
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
@@ -127,6 +108,16 @@ const Properties = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+
+  const handleSortChange = (e) => {
+    const sortValue = e.target.value;
+    setFilters(prev => ({
+      ...prev,
+      sortBy: sortValue
+    }));
+    setCurrentPage(1);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4">
@@ -135,7 +126,12 @@ const Properties = () => {
           <p className="text-xl text-gray-600">Find your perfect home from our curated collection</p>
         </div>
 
-        <SearchFilters onSearch={handleSearch} onFilter={handleFilter} loading={loading} />
+        <SearchFilters 
+          onSearch={handleSearch} 
+          onFilter={handleFilter} 
+          loading={loading} 
+          currentFilters={filters}
+        />
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -156,12 +152,20 @@ const Properties = () => {
             <div className="mb-6 flex justify-between items-center">
               <p className="text-gray-600">
                 Showing {startItem}-{endItem} of {totalCount} properties
+                {searchTerm && ` for "${searchTerm}"`}
+                {filters.location && ` in ${filters.location}`}
+                {filters.propertyType && ` • ${filters.propertyType}`}
+                {filters.listingType && ` • For ${filters.listingType}`}
               </p>
               
-              {/* Sort Options (Optional) */}
+              {/* Sort Options */}
               <div className="flex items-center space-x-2">
                 <label className="text-sm text-gray-600">Sort by:</label>
-                <select className="border border-gray-300 rounded px-3 py-1 text-sm">
+                <select 
+                  value={filters.sortBy || 'newest'} 
+                  onChange={handleSortChange}
+                  className="border border-gray-300 rounded px-3 py-1 text-sm"
+                >
                   <option value="newest">Newest First</option>
                   <option value="price-low">Price: Low to High</option>
                   <option value="price-high">Price: High to Low</option>
@@ -169,17 +173,34 @@ const Properties = () => {
               </div>
             </div>
 
-            {filteredProperties.length === 0 ? (
+            {properties.length === 0 ? (
               <div className="text-center py-12">
                 <div className="text-gray-400 text-6xl mb-4">🏠</div>
                 <h3 className="text-xl font-semibold text-gray-600 mb-2">No properties found</h3>
-                <p className="text-gray-500">Try adjusting your search criteria or filters</p>
+                <p className="text-gray-500">
+                  {searchTerm || Object.keys(filters).length > 0 
+                    ? 'Try adjusting your search criteria or filters' 
+                    : 'No properties available at the moment'
+                  }
+                </p>
+                {(searchTerm || Object.keys(filters).length > 0) && (
+                  <button
+                    onClick={() => {
+                      setSearchTerm('');
+                      setFilters({});
+                      setCurrentPage(1);
+                    }}
+                    className="mt-4 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition"
+                  >
+                    Clear All Filters
+                  </button>
+                )}
               </div>
             ) : (
               <>
                 {/* Properties Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                  {filteredProperties.map(property => (
+                  {properties.map(property => (
                     <PropertyCard key={property.id} property={property} />
                   ))}
                 </div>
