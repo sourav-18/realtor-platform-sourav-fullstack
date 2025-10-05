@@ -66,7 +66,8 @@ create database (any name)
 🌐 Links
 
 - GitHub Repository: https://github.com/sourav-18/realtor-platform-sourav-fullstack
-- Demo Video: ""
-- Live App URL: https://realtor-platform-sourav-git-437eec-sourav-das-projects-6a1e3176.vercel.app/
+- Postman Collection: https://www.postman.com/cloudy-crescent-770366/workspace/public-api/collection/18039051-7716563c-d9ea-4d23-b8ad-bf83739eac8e?action=share&creator=18039051
+- Demo Video: https://drive.google.com/file/d/1sieC_K5WEvlLSoRerI11oCHk-ScAAgWU/view?usp=sharing
+- Live Application URL: https://realtor-platform-sourav-git-437eec-sourav-das-projects-6a1e3176.vercel.app/
 - Live Api URL: https://realtor-platform-sourav-fullstack.onrender.com/api/v1
 
