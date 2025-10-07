@@ -1,17 +1,13 @@
 const { Sequelize } = require("sequelize");
 const serverEnv = require("../utils/serverEnv.utils");
 
-const sequelize = new Sequelize(serverEnv.DB_NAME, serverEnv.DB_USER, serverEnv.DB_PASSWORD, {
+const dbConnectionInfo = {
     host: serverEnv.DB_HOST,
     dialect: 'postgres',
-    dialectOptions: {
-        ssl: {
-            require: true,
-            rejectUnauthorized: false
-        }
-    },
     logging: false
-});
+}
+
+const sequelize = new Sequelize(serverEnv.DB_NAME, serverEnv.DB_USER, serverEnv.DB_PASSWORD,dbConnectionInfo);
 
 // const sequelize = new Sequelize('', {
 //     dialect: 'postgres',
